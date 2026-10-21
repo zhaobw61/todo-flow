@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #16201d;
+  --muted: #66716d;
+  --paper: #f4f2ea;
+  --surface: #fffdf7;
+  --forest: #173e34;
+  --lime: #dfff72;
+  --line: #d9d9cf;
+  --danger: #a44b45;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; }
+body {
+  margin: 0;
+  background: radial-gradient(circle at 12% 8%, rgba(184, 243, 212, .48), transparent 24rem), radial-gradient(circle at 88% 90%, rgba(223, 255, 114, .24), transparent 26rem), var(--paper);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid #58a985; outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.page-shell { width: min(100% - 32px, 920px); margin: 0 auto; padding: clamp(24px, 6vw, 72px) 0 30px; }
+.todo-app { overflow: hidden; background: var(--surface); border: 1px solid rgba(22, 32, 29, .1); border-radius: 28px; box-shadow: 0 26px 80px rgba(30, 52, 45, .13); }
+.app-header { padding: 30px clamp(24px, 6vw, 66px) 52px; color: white; background: linear-gradient(120deg, rgba(223, 255, 114, .08), transparent 48%), var(--forest); }
+
+.brand-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: white; font-weight: 800; letter-spacing: -.02em; text-decoration: none; }
+.brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--lime); color: var(--forest); }
+.date-chip { padding: 8px 13px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 99px; color: rgba(255, 255, 255, .72); font-size: 12px; }
+
+.hero-copy { margin-top: 64px; }
+.eyebrow, .section-label { margin: 0 0 14px; color: var(--lime); font: 700 11px/1.2 monospace; letter-spacing: .16em; }
+.hero-copy h1 { margin: 0; font-size: clamp(38px, 7vw, 64px); line-height: 1.08; letter-spacing: -.055em; }
+.hero-copy > p:last-child { max-width: 550px; margin: 18px 0 0; color: rgba(255, 255, 255, .66); line-height: 1.7; }
+
+.add-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; margin-top: 34px; }
+.add-form input { min-width: 0; height: 54px; padding: 0 18px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 12px; background: rgba(255, 255, 255, .1); color: white; }
+.add-form input::placeholder { color: rgba(255, 255, 255, .5); }
+.add-form button { min-height: 54px; padding: 0 20px; border: 0; border-radius: 12px; background: var(--lime); color: var(--forest); font-weight: 800; }
+.add-form button:hover:not(:disabled) { background: #e8ff9c; }
+
+.content-panel { padding: 42px clamp(24px, 6vw, 66px) 34px; }
+.summary-row { display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+.section-label { color: #608373; }
+.summary-row h2 { margin: 0; font-size: clamp(30px, 4vw, 42px); letter-spacing: -.045em; }
+.progress-copy { text-align: right; }
+.progress-copy strong { display: block; font: 800 34px/1 monospace; color: var(--forest); }
+.progress-copy span { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; }
+.progress-track { height: 7px; margin: 24px 0 30px; overflow: hidden; border-radius: 99px; background: #e4e4dc; }
+.progress-track span { display: block; height: 100%; border-radius: inherit; background: var(--forest); transition: width .25s ease; }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 12px; }
+.filters { display: flex; flex-wrap: wrap; gap: 7px; }
+.filter, .clear-button { border: 1px solid var(--line); border-radius: 99px; background: transparent; color: var(--muted); padding: 8px 13px; font-size: 13px; }
+.filter:hover, .filter.active { border-color: var(--forest); background: var(--forest); color: white; }
+.clear-button { border: 0; color: var(--danger); }
+.clear-button:hover:not(:disabled) { background: #f7e9e7; }
+
+.todo-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.todo-item { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 76px; border-bottom: 1px solid var(--line); }
+.check-button { appearance: none; display: grid; place-items: center; width: 44px; height: 44px; margin: 0; border: 1px solid #acb6b1; border-radius: 50%; background: white; color: white; cursor: pointer; font-weight: 800; }
+.check-button:checked::after { content: "✓"; }
+.check-button:hover { border-color: var(--forest); }
+.completed .check-button { border-color: var(--forest); background: var(--forest); }
+.todo-title { overflow-wrap: anywhere; line-height: 1.5; }
+.completed .todo-title { color: #8a928f; text-decoration: line-through; }
+.delete-button { min-width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--muted); padding: 8px; font-size: 12px; }
+.delete-button:hover, .delete-button:focus-visible { color: var(--danger); }
+
+@media (hover: hover) {
+  .delete-button { color: transparent; }
+  .todo-item:hover .delete-button, .delete-button:focus-visible { color: var(--danger); }
+}
+
+.empty-state { padding: 58px 20px; text-align: center; border-top: 1px solid var(--line); }
+.empty-state > span { display: block; color: #8eb1a1; font-size: 52px; line-height: 1; }
+.empty-state h3 { margin: 14px 0 7px; }
+.empty-state p { margin: 0; color: var(--muted); }
+.loading-state { padding: 58px 20px; text-align: center; border-top: 1px solid var(--line); color: var(--muted); }
+.list-footer { display: flex; justify-content: space-between; padding-top: 20px; color: var(--muted); font-size: 12px; }
+.page-note { margin: 20px 0 0; text-align: center; color: var(--muted); font-size: 12px; letter-spacing: .1em; }
+
+@media (max-width: 600px) {
+  .page-shell { width: min(100% - 20px, 920px); padding-top: 10px; }
+  .todo-app { border-radius: 20px; }
+  .app-header { padding: 24px 20px 34px; }
+  .hero-copy { margin-top: 52px; }
+  .hero-copy h1 { font-size: 40px; }
+  .add-form { grid-template-columns: 1fr; }
+  .add-form button { width: 100%; }
+  .content-panel { padding: 34px 20px 26px; }
+  .toolbar { align-items: flex-start; flex-direction: column; }
+  .clear-button { padding-left: 0; }
+  .delete-button { color: var(--muted); }
+}
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
