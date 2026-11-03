@@ -6,7 +6,7 @@
   - 文件：`app/page.tsx`
   - 验证：AC1–AC9；`npm run lint` 通过
 
-- [ ] T2 搜索框样式与移动端适配（globals.css）
+- [x] T2 搜索框样式与移动端适配（globals.css）
   - 内容：`.search-box` 样式、隐藏原生清除图标、清除按钮触控尺寸、390px 下无横向滚动
   - 依赖：T1
   - 文件：`app/globals.css`

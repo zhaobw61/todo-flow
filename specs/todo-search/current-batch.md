@@ -8,32 +8,32 @@
 ## 执行模式
 
 - 模式：串行
-- 选择原因：本批仅 1 个任务；T2 依赖 T1 的 DOM 结构与类名
+- 选择原因：本批仅 1 个任务（T2），它依赖已完成的 T1
 
 ## 需要保护的现有修改
 
-- 文件：无（W1 时工作区干净）
-- 保护要求：不改动 add/toggle/delete/clear/持久化既有行为
+- 文件：无（T1 已提交为 7643436，工作区只有未跟踪的 `.playwright-mcp/` 测试产物）
+- 保护要求：不修改既有选择器的视觉表现
 
 ## 本批任务
 
-### T1 搜索逻辑、搜索框与交互
+### T2 搜索框样式与移动端适配
 
-- 目标：实现按名称实时搜索，与状态筛选取交集
-- 前置依赖：无
-- 预计修改文件：`app/page.tsx`
-- 对应验收标准：AC1–AC9
-- 验证方法：`npm run lint`；浏览器按 AC1–AC9 操作
+- 目标：给 `.search-box` / `#todo-search` / `.search-clear` 加上与现有设计一致的样式；隐藏原生搜索清除图标；清除按钮触控尺寸 ≥ 40px；390px 下无横向滚动
+- 前置依赖：T1（已完成）
+- 预计修改文件：`app/globals.css`
+- 对应验收标准：AC10、AC11
+- 验证方法：`npm run build`；Playwright 在 390px 和桌面宽度下截图、检查 scrollWidth 和控件尺寸；回归 AC1–AC9 的核心路径
 - 执行者：Claude
 
 ## 项目约束
 
-- 必须遵守的 AGENTS.md 规则：项目无 AGENTS.md；遵守 yd-ai-nodes 共同规则
-- 禁止修改的文件：`tests/`、`app/layout.tsx`、`package.json`、持久化格式
-- 不在本批范围内的功能：样式美化（T2）、拼音/模糊搜索、高亮
+- 必须遵守的 AGENTS.md 规则：浏览器验收用 `vite.pages.config.ts` 启动；lint 与基线对比；build 后还原 `next-env.d.ts`
+- 禁止修改的文件：`app/page.tsx`（除非发现阻断问题）、`tests/`、`package.json`
+- 不在本批范围内的功能：任何新增交互
 
 ## W4 交接说明
 
-- 开发顺序：状态与派生 → 搜索框与清除 → 空状态与播报 → 删除焦点
+- 开发顺序：搜索框容器 → 输入框 → 清除按钮 → 移动端媒体查询
 - 并行任务的整合顺序：无
-- 开发完成后需要执行的最小检查：`npm run lint`、`npx tsc --noEmit`
+- 开发完成后需要执行的最小检查：`npm run build`，并在浏览器中查看

@@ -50,3 +50,23 @@
 
 - T1 范围内的验收场景（AC1–AC9，以及 AC10 中的横向滚动 / 控制台检查）全部通过
 - 允许进入 W7
+
+---
+
+# 测试报告（T2）
+
+- 环境：同 T1（Vite pages 入口，http://localhost:5179/，Playwright MCP）
+- 命令：`npm run build` 通过（`next-env.d.ts` 已还原）；`npx eslint app` 1 个错误、`tsc` 3 个错误，与基线一致，没有新增
+
+| AC | 操作 | 实际 | 结果 |
+|---|---|---|---|
+| AC10 | 390×844 下输入超长关键词 | `scrollWidth=390`；输入框 328×48、字号 16px；清除按钮 46×44；原生 ✕ 不显示；长文本不与清除按钮重叠（截图 `.playwright-mcp/t2-390.png`） | 通过 |
+| AC10 | 1280×900 下搜索 `Claude` | `scrollWidth=1280`，布局正常（截图 `.playwright-mcp/t2-1280.png`） | 通过 |
+| AC10 | 控制台 | 只有 `favicon.ico` 404（既有问题，非阻断） | 通过 |
+| AC11 | build / lint / tsc | build 通过，没有新增错误 | 通过 |
+| 回归 AC3 | 390px 下输入 `claude` | 只显示 Claude 任务 | 通过 |
+| 回归 AC7 | 390px 下点击「清除搜索」/ 按 Esc | 搜索清空、焦点回到搜索框、列表恢复 | 通过 |
+
+注：此时列表为 2 项，是因为 T1 测试中删除了「部署到 Cloudflare Pages」（测试浏览器的 localStorage，不是真实用户数据）。
+
+- 结论：通过，允许进入 W7

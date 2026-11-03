@@ -54,3 +54,57 @@
 - 需要重点审查的文件：`app/page.tsx`
 - 可能存在的风险：删除焦点逻辑变更；两个 live region 同时播报
 - 建议执行的检查：筛选 + 搜索组合、删除后焦点、Esc 行为
+
+---
+
+# 本批开发报告（批次 2：T2）
+
+## 批次信息
+
+- Feature：按任务名称搜索
+- 批次任务：T2 搜索框样式与移动端适配
+- 执行模式：串行
+- 实际执行者：Claude
+
+## 完成的任务
+
+### T2 搜索框样式与移动端适配
+
+- 完成内容：
+  - 新增 `.search-box` 样式：相对定位，下边距 16px
+  - 输入框：宽 100%，高 48px，字号 16px（避免 iOS 自动放大），右侧留出 64px 给清除按钮，沿用 `--line` / `--ink` 配色
+  - 隐藏原生 `::-webkit-search-cancel-button`
+  - `.search-clear`：绝对定位在输入框内右侧，最小 44×44px，悬停时变色
+  - 焦点环沿用全局 `input:focus-visible` / `button:focus-visible`
+- 对应验收标准：AC10、AC11
+- 修改文件：`app/globals.css`
+- 调用的 Skill：responsive-ui
+- 执行者：Claude
+
+## 基础验证
+
+- 执行的检查：`npm run build`、`npx eslint app`、`npx tsc --noEmit`，以及 Playwright 在 390px 和 1280px 下各截图一次
+- 检查结果：
+  - build 通过（`next-env.d.ts` 已还原）
+  - lint / tsc 错误数与基线一致（eslint app 1 个，tsc 3 个）
+  - 390px：`scrollWidth=390`，输入框 328×48，清除按钮 46×44，原生 ✕ 已隐藏，长关键词不与清除按钮重叠
+  - 1280px：`scrollWidth=1280`
+- 未执行的检查及原因：无
+
+## 与原计划的差异
+
+- 是否偏离：否（触控尺寸按 responsive-ui Skill 取 44px，高于规格要求的 40px）
+
+## 需要保护的修改
+
+- 原有用户修改：无
+- 本批如何避免覆盖：只新增 `.search-*` 选择器，没有改动已有规则
+
+## 未解决问题
+
+- 无
+
+## W5 交接说明
+
+- 需要重点审查的文件：`app/globals.css`
+- 可能存在的风险：Firefox 不支持 `::-webkit-search-cancel-button`，但 Firefox 本身也不显示原生清除图标
