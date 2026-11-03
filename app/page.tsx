@@ -36,9 +36,11 @@ export default function Home() {
   const [todos, setTodos] = useState<Todo[]>(defaultTodos);
   const [input, setInput] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState("");
   const [ready, setReady] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const todoRefs = useRef(new Map<string, HTMLInputElement>());
 
   useEffect(() => {
@@ -60,11 +62,17 @@ export default function Home() {
     }
   }, [ready, todos]);
 
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+
   const visibleTodos = useMemo(() => {
-    if (filter === "active") return todos.filter((todo) => !todo.completed);
-    if (filter === "completed") return todos.filter((todo) => todo.completed);
-    return todos;
-  }, [filter, todos]);
+    let result = todos;
+    if (filter === "active") result = result.filter((todo) => !todo.completed);
+    if (filter === "completed") result = result.filter((todo) => todo.completed);
+    if (normalizedQuery) {
+      result = result.filter((todo) => todo.title.toLocaleLowerCase().includes(normalizedQuery));
+    }
+    return result;
+  }, [filter, todos, normalizedQuery]);
 
   const completedCount = todos.filter((todo) => todo.completed).length;
   const remainingCount = todos.length - completedCount;
@@ -88,17 +96,23 @@ export default function Home() {
   }
 
   function deleteTodo(id: string) {
-    const index = todos.findIndex((todo) => todo.id === id);
-    const deleted = todos[index];
-    const next = todos.filter((todo) => todo.id !== id);
+    const deleted = todos.find((todo) => todo.id === id);
+    const index = visibleTodos.findIndex((todo) => todo.id === id);
+    const nextVisible = visibleTodos.filter((todo) => todo.id !== id);
     setAnnouncement(`已删除：${deleted?.title ?? "任务"}`);
     setTodos((current) => current.filter((todo) => todo.id !== id));
 
     window.requestAnimationFrame(() => {
-      const nextTodo = next[Math.min(index, next.length - 1)];
+      const nextTodo = nextVisible[Math.min(Math.max(index, 0), nextVisible.length - 1)];
       if (nextTodo) todoRefs.current.get(nextTodo.id)?.focus();
+      else if (normalizedQuery) searchRef.current?.focus();
       else inputRef.current?.focus();
     });
+  }
+
+  function clearSearch() {
+    setQuery("");
+    searchRef.current?.focus();
   }
 
   function clearCompleted() {
@@ -158,6 +172,31 @@ export default function Home() {
             <span style={{ width: `${progress}%` }} />
           </div>
 
+          <div className="search-box" role="search">
+            <label className="sr-only" htmlFor="todo-search">搜索任务</label>
+            <input
+              id="todo-search"
+              ref={searchRef}
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape" && query) {
+                  event.preventDefault();
+                  clearSearch();
+                }
+              }}
+              placeholder="搜索任务名称"
+              autoComplete="off"
+              maxLength={120}
+            />
+            {query && (
+              <button type="button" className="search-clear" aria-label="清除搜索" onClick={clearSearch}>
+                清除
+              </button>
+            )}
+          </div>
+
           <div className="toolbar">
             <div className="filters" role="group" aria-label="筛选任务">
               {(Object.keys(filterLabels) as Filter[]).map((value) => (
@@ -183,6 +222,9 @@ export default function Home() {
           </div>
 
           <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
+          <p className="sr-only" role="status" aria-live="polite">
+            {ready && normalizedQuery ? `找到 ${visibleTodos.length} 项匹配任务` : ""}
+          </p>
 
           <ul className="todo-list" aria-busy={!ready}>
             {ready && visibleTodos.map((todo) => (
@@ -216,8 +258,16 @@ export default function Home() {
           {ready && visibleTodos.length === 0 && (
             <div className="empty-state">
               <span aria-hidden="true">○</span>
-              <h3>{todos.length === 0 ? "清单还是空的" : "这里没有任务"}</h3>
-              <p>{todos.length === 0 ? "在上方输入一件想完成的事吧。" : "换个筛选条件看看。"}</p>
+              <h3>
+                {todos.length === 0
+                  ? "清单还是空的"
+                  : normalizedQuery ? "没有找到匹配的任务" : "这里没有任务"}
+              </h3>
+              <p>
+                {todos.length === 0
+                  ? "在上方输入一件想完成的事吧。"
+                  : normalizedQuery ? "换个关键词或清除搜索试试。" : "换个筛选条件看看。"}
+              </p>
             </div>
           )}
 
