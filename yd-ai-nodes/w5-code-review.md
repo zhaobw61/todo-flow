@@ -15,13 +15,34 @@ Codex 只负责发现问题并提出修改建议；Claude 根据审查结果判�
 - 与本批任务相关的 `AGENTS.md`；
 - 本批任务的验收标准和验证方法。
 
+## Codex CLI 查找规则
+
+调用 Codex 前必须先确定可执行文件位置：
+
+1. 先执行 `command -v codex`；
+2. 如果找到，使用返回的路径；
+3. 如果没有找到，检查 ChatGPT App 内置路径：
+   `/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex`
+4. 如果内置文件存在且可执行，使用该绝对路径；
+5. 两种方式都找不到时才暂停并询问用户。
+
+不得因为 `codex` 不在 PATH 中就判断为未安装，不得使用 Claude 代替 Codex 审查，也不得跳过 W5。
+
 ## 执行步骤
 
 1. 检查 Git 改动中是否包含密码、密钥或其他敏感信息；
-2. Claude 在项目根目录调用 Codex CLI：
+2. Claude 在项目根目录使用已经找到的 Codex CLI 路径执行审查。
+
+   如果 `command -v codex` 成功：
 
    ```bash
    codex review --uncommitted
+   ```
+
+   如果 `command -v codex` 没有结果，但 ChatGPT App 内置版本存在：
+
+   ```bash
+   /Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex review --uncommitted
    ```
 
 3. Codex 根据 Feature 规格、验收标准和当前代码改动进行审查；
