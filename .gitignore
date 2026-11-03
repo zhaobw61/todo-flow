@@ -46,3 +46,5 @@ yarn-error.log*
 
 # review packages
 *.zip
+
+/.playwright-mcp/
