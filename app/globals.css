@@ -66,7 +66,8 @@ button:disabled { cursor: not-allowed; opacity: .45; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 12px; }
 .filters { display: flex; flex-wrap: wrap; gap: 7px; }
 .filter, .clear-button { border: 1px solid var(--line); border-radius: 99px; background: transparent; color: var(--muted); padding: 8px 13px; font-size: 13px; }
-.filter:hover, .filter.active { border-color: var(--forest); background: var(--forest); color: white; }
+.filter:hover { border-color: var(--forest); background: #eef1ea; color: var(--forest); }
+.filter.active { border-color: var(--forest); background: var(--forest); color: white; }
 .clear-button { border: 0; color: var(--danger); }
 .clear-button:hover:not(:disabled) { background: #f7e9e7; }
 

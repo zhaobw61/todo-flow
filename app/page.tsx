@@ -42,6 +42,13 @@ export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const todoRefs = useRef(new Map<string, HTMLInputElement>());
+  const filterRefs = useRef(new Map<Filter, HTMLButtonElement>());
+  const pendingFocusRef = useRef<
+    | { type: "todo"; id: string }
+    | { type: "search" }
+    | { type: "filter"; filter: Filter }
+    | null
+  >(null);
 
   useEffect(() => {
     try {
@@ -74,6 +81,15 @@ export default function Home() {
     return result;
   }, [filter, todos, normalizedQuery]);
 
+  useEffect(() => {
+    const target = pendingFocusRef.current;
+    if (!target) return;
+    pendingFocusRef.current = null;
+    if (target.type === "todo") todoRefs.current.get(target.id)?.focus();
+    else if (target.type === "search") searchRef.current?.focus();
+    else filterRefs.current.get(target.filter)?.focus();
+  }, [visibleTodos]);
+
   const completedCount = todos.filter((todo) => todo.completed).length;
   const remainingCount = todos.length - completedCount;
   const progress = todos.length === 0 ? 0 : Math.round((completedCount / todos.length) * 100);
@@ -90,6 +106,15 @@ export default function Home() {
   function toggleTodo(id: string) {
     const todo = todos.find((item) => item.id === id);
     if (todo) setAnnouncement(`${todo.completed ? "已恢复" : "已完成"}：${todo.title}`);
+    const index = visibleTodos.findIndex((item) => item.id === id);
+    const leavesView = todo !== undefined && index !== -1
+      && ((filter === "active" && !todo.completed) || (filter === "completed" && todo.completed));
+    if (leavesView) {
+      const neighbor = visibleTodos[index + 1] ?? visibleTodos[index - 1];
+      if (neighbor) pendingFocusRef.current = { type: "todo", id: neighbor.id };
+      else if (normalizedQuery) pendingFocusRef.current = { type: "search" };
+      else pendingFocusRef.current = { type: "filter", filter };
+    }
     setTodos((current) => current.map((item) =>
       item.id === id ? { ...item, completed: !item.completed } : item,
     ));
@@ -205,6 +230,10 @@ export default function Home() {
                   key={value}
                   className={filter === value ? "filter active" : "filter"}
                   aria-pressed={filter === value}
+                  ref={(element) => {
+                    if (element) filterRefs.current.set(value, element);
+                    else filterRefs.current.delete(value);
+                  }}
                   onClick={() => setFilter(value)}
                 >
                   {filterLabels[value]}
