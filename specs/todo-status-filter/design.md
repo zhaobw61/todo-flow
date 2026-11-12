@@ -14,8 +14,8 @@
   - 第 200–213 行：`.toolbar` 内的筛选按钮组，第 201 行 `role="group" aria-label="筛选任务"`，第 202 行按 `filterLabels` 的键顺序渲染，第 206 行选中时 `className="filter active"`，第 207 行 `aria-pressed`，第 208 行 `onClick={() => setFilter(value)}`；
   - 第 98–111 行：`deleteTodo` 基于 `visibleTodos` 选择删除后的焦点目标；
   - 第 258–272 行：空状态，按以下优先级显示：全部任务为空时显示「清单还是空的」/「在上方输入一件想完成的事吧。」（第 262–263、267–268 行，对应 AC14）；否则有搜索词时显示「没有找到匹配的任务」/「换个关键词或清除搜索试试。」；否则显示「这里没有任务」/「换个筛选条件看看。」（第 264、269 行，对应 AC8）；
-  - 第 90–96 行：`toggleTodo` 只更新 `todos` 和播报文案，没有焦点处理；对比第 105–110 行，`deleteTodo` 会用 `requestAnimationFrame` 转移焦点。`toggleTodo` 没有焦点处理导致的焦点丢失已在 T6-REPRO 中两次复现（W6 r20261111-w6r5、r20261111-w6r6：焦点落到 `body`），由 T6 按 AC16 修复（见「准备修改的文件」）；
-  - 第 44 行：`todoRefs`（`Map<id, HTMLInputElement>`），已有的复选框引用；第 201–212 行的筛选按钮目前没有 ref；
+  - 第 90–96 行（T6 修改前基准，HEAD `e86e8a8`）：`toggleTodo` 只更新 `todos` 和播报文案，没有焦点处理；对比第 105–110 行，`deleteTodo` 会用 `requestAnimationFrame` 转移焦点。`toggleTodo` 没有焦点处理导致的焦点丢失已在 T6-REPRO 中两次复现（W6 r20261111-w6r5、r20261111-w6r6：焦点落到 `body`），由 T6 按 AC16 修复（见「准备修改的文件」）。当前位置（T6 修改后）：`toggleTodo` 位于第 106–121 行，含按 AC16 选择焦点目标的逻辑；焦点 Effect 位于第 84–91 行；
+  - 第 44 行（T6 修改前基准，HEAD `e86e8a8`）：`todoRefs`（`Map<id, HTMLInputElement>`），已有的复选框引用；第 201–212 行的筛选按钮当时没有 ref。当前位置（T6 修改后）：`todoRefs` 第 44 行，新增 `filterRefs` 第 45 行、`pendingFocusRef` 第 46–51 行；筛选按钮组位于第 226 行起，按钮 ref 回调在第 234–235 行；空状态文案位于第 291–298 行（「这里没有任务」第 293 行、「换个筛选条件看看。」第 298 行）；
   - 第 36、46–63 行：`todos` 的读取和保存只涉及任务数组，不涉及 `filter`。
 - `app/globals.css`
   - 第 66 行：`.toolbar` 布局；
@@ -28,7 +28,7 @@
 
 ## 准备修改的文件
 
-本次唯一的业务代码改动：按 code-review-report.md S1-2 的用户决定，拆分 `app/globals.css` 第 69 行的 `.filter` 规则（由 tasks.md 的 T7 在 W4 中执行，W2 只写进规格）。`app/page.tsx` 和其他样式规则不修改。
+本次业务代码改动共两处：（1）T7：按 code-review-report.md S1-2 的用户决定，拆分 `app/globals.css` 第 69 行的 `.filter` 规则（由 tasks.md 的 T7 在 W4 中执行，W2 只写进规格）；（2）T6：按用户决定 D-T6-fix、AC16 最小修改 `app/page.tsx` 的切换后焦点逻辑（见下文第 52 行起的 T6 说明）。其他样式规则不修改。
 
 修改前第 69 行（T7 修改前的基准；当前工作区已按下方规则拆分为 `app/globals.css:69-70`）：
 
